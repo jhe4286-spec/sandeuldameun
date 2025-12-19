@@ -1,0 +1,516 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>산들담은 - 순천 떡갈비 한정식</title>
+    <meta name="description" content="순천만국가정원 인근 맛집, 자연을 담은 건강한 밥상 산들담은입니다. 한우/한돈 떡갈비 정식을 만나보세요.">
+    <meta name="keywords" content="순천맛집, 순천만맛집, 순천떡갈비, 산들담은, 순천한정식">
+    <meta property="og:type" content="website">
+    <meta property="og:title" content="산들담은 - 순천 떡갈비 한정식">
+    <meta property="og:description" content="순천만국가정원 인근, 자연을 담은 건강한 밥상. 정성 가득한 떡갈비 정식을 즐겨보세요.">
+    <meta property="og:image" content="https://res.cloudinary.com/djamggick/image/upload/v1766052085/%EC%82%B0%EB%93%A4_%EC%82%AC%EB%9E%91%EB%B0%A9_kiaywd.jpg">
+    <meta property="og:url" content="https://sandeuldam.com">
+    
+    <!-- React & ReactDOM -->
+    <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+    <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+    
+    <!-- Babel for JSX -->
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+KR:wght@400;700&family=Pretendard:wght@400;600;800&display=swap" rel="stylesheet">
+
+    <style>
+        body { font-family: 'Pretendard', sans-serif; }
+        .serif { font-family: 'Noto Serif KR', serif; }
+        .scroll-mt-20 { scroll-margin-top: 5rem; }
+        /* 관리자 모드 스타일 */
+        .admin-overlay { border: 2px dashed #ff0000; position: relative; cursor: pointer; }
+        .admin-overlay::after { 
+            content: '클릭하여 수정'; 
+            position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
+            background: rgba(0,0,0,0.7); color: white; padding: 4px 8px; font-size: 12px; border-radius: 4px;
+            pointer-events: none;
+        }
+    </style>
+    
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#5D7C65', // 자연친화적인 짙은 녹색
+                        secondary: '#D9C8A9', // 따뜻한 베이지
+                        dark: '#2C3E32',
+                    }
+                }
+            }
+        }
+    </script>
+</head>
+<body class="bg-stone-50 text-stone-800">
+    <div id="root"></div>
+
+    <script type="text/babel">
+        const { useState, useEffect, useRef } = React;
+
+        // --- 초기 데이터 ---
+        const INITIAL_DATA = {
+            info: {
+                name: "산들담은",
+                phone: "0507-1449-0180",
+                address: "전라남도 순천시 해룡면 정채봉길 30",
+                hours: [
+                    "월~토 11:00 ~ 21:00",
+                    "브레이크타임 15:00 ~ 17:00",
+                    "일요일 정기휴무"
+                ],
+                bookingUrl: "https://map.naver.com/p/entry/place/36444087?lng=127.551462&lat=34.9174375&placePath=%2Fbooking%3Fentry%3Dplt&entry=plt&searchType=place&c=15.00,0,0,0,dh",
+                kakaoUrl: "https://open.kakao.com/o/sIpy296h"
+            },
+            heroImages: [
+                "https://res.cloudinary.com/djamggick/image/upload/v1766052085/%EC%82%B0%EB%93%A4_%EC%82%AC%EB%9E%91%EB%B0%A9_kiaywd.jpg",
+                "https://res.cloudinary.com/djamggick/image/upload/v1766052322/%EC%82%B0%EB%93%A42_up3cj8.jpg",
+                "https://res.cloudinary.com/djamggick/image/upload/v1766052460/%EC%82%B0%EB%93%A43_vuetpp.jpg"
+            ],
+            menus: [
+                {
+                    name: "산들담은 정식",
+                    desc: "한우와 한돈이 조화로운 대표 떡갈비 정식",
+                    price: "23,000",
+                    spicyPrice: "24,000",
+                    image: "https://search.pstatic.net/common/?src=https%3A%2F%2Fldb-phinf.pstatic.net%2F20210424_186%2F1619194206316H8kTG_PNG%2FumF8ocEWQCG2nq8pqFoi_fEF.png"
+                },
+                {
+                    name: "산들좋은 정식",
+                    desc: "부드럽고 담백한 한돈 떡갈비 정식",
+                    price: "20,000",
+                    spicyPrice: "21,000",
+                    image: "https://search.pstatic.net/common/?src=https%3A%2F%2Fldb-phinf.pstatic.net%2F20210424_299%2F1619194114775xQzpf_PNG%2FI25s-0P-Sc-GrAPEPrXQ3QiB.png"
+                },
+                {
+                    name: "산들보감 정식",
+                    desc: "깊은 풍미의 프리미엄 한우 떡갈비 정식",
+                    price: "29,000",
+                    spicyPrice: "30,000",
+                    image: "https://res.cloudinary.com/djamggick/image/upload/v1766066529/%EB%8B%A4%EC%9A%B4%EB%A1%9C%EB%93%9C_awvum4.png"
+                }
+            ],
+            faqs: [
+                { q: "주차 가능한가요?", a: "네, 매장 앞 전용 주차장이 마련되어 있습니다." },
+                { q: "예약은 어떻게 하나요?", a: "네이버 예약이나 전화로 예약을 받고 있습니다." },
+                { q: "단체 예약도 되나요?", a: "네, 가능합니다! 전화로 문의해주세요." },
+                { q: "아기 의자가 있나요?", a: "네, 유아용 의자와 식기가 준비되어 있습니다." },
+                { q: "현장 예약은 어떻게 하나요?", a: "매장 내 카운터에서 현장 이름과 전화번호를 접수 받고, 대기하는 방식입니다." }
+            ]
+        };
+
+        // --- COMPONENTS ---
+
+        // 이미지/텍스트 수정을 돕는 래퍼 컴포넌트
+        const Editable = ({ isAdmin, type, value, onUpdate, children, className = "" }) => {
+            if (!isAdmin) return children;
+
+            const handleClick = (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                
+                if (type === 'image') {
+                    const input = document.createElement('input');
+                    input.type = 'file';
+                    input.accept = 'image/*';
+                    input.onchange = (e) => {
+                        const file = e.target.files[0];
+                        if (file) {
+                            if (file.size > 10 * 1024 * 1024) { // 10MB 제한
+                                alert("파일 크기는 10MB 이하여야 합니다.");
+                                return;
+                            }
+                            const reader = new FileReader();
+                            reader.onload = (e) => onUpdate(e.target.result);
+                            reader.readAsDataURL(file);
+                        }
+                    };
+                    input.click();
+                } else if (type === 'text') {
+                    const newVal = prompt("새로운 내용을 입력하세요:", value);
+                    if (newVal !== null) onUpdate(newVal);
+                }
+            };
+
+            return (
+                <div onClick={handleClick} className={`admin-overlay ${className}`} title="클릭하여 수정">
+                    {children}
+                </div>
+            );
+        };
+
+        const Header = ({ data, isAdmin }) => {
+            const [isScrolled, setIsScrolled] = useState(false);
+            const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+
+            useEffect(() => {
+                const handleScroll = () => setIsScrolled(window.scrollY > 50);
+                window.addEventListener('scroll', handleScroll);
+                return () => window.removeEventListener('scroll', handleScroll);
+            }, []);
+
+            useEffect(() => {
+                if (isMobileMenuOpen) lucide.createIcons();
+            }, [isMobileMenuOpen]);
+
+            const navLinks = [
+                { name: "소개", href: "#home" },
+                { name: "메뉴", href: "#menu" },
+                { name: "정보", href: "#info" },
+                { name: "문의", href: "#contact" },
+            ];
+
+            return (
+                <header className={`fixed top-0 w-full z-50 transition-all duration-300 ${isScrolled ? 'bg-white/95 backdrop-blur-sm shadow-md py-3' : 'bg-transparent py-5'}`}>
+                    <div className="container mx-auto px-4 flex justify-between items-center">
+                        <h1 className={`text-2xl font-bold serif ${isScrolled ? 'text-primary' : 'text-white'}`}>
+                            {data.info.name}
+                        </h1>
+                        
+                        <nav className="hidden md:flex gap-8">
+                            {navLinks.map(link => (
+                                <a key={link.name} href={link.href} className={`font-medium hover:opacity-70 ${isScrolled ? 'text-gray-800' : 'text-white'}`}>
+                                    {link.name}
+                                </a>
+                            ))}
+                        </nav>
+
+                        <button className="md:hidden" onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}>
+                            <i data-lucide={isMobileMenuOpen ? "x" : "menu"} className={isScrolled ? 'text-gray-800' : 'text-white'}></i>
+                        </button>
+                    </div>
+
+                    {isMobileMenuOpen && (
+                        <div className="md:hidden absolute top-full left-0 w-full bg-white shadow-lg py-4 px-4 flex flex-col gap-4">
+                            {navLinks.map(link => (
+                                <a key={link.name} href={link.href} onClick={() => setIsMobileMenuOpen(false)}
+                                   className="text-gray-800 font-medium py-2 border-b border-gray-100 last:border-0">
+                                    {link.name}
+                                </a>
+                            ))}
+                        </div>
+                    )}
+                </header>
+            );
+        };
+
+        const Hero = ({ data, updateData, isAdmin }) => {
+            const [currentSlide, setCurrentSlide] = useState(0);
+
+            useEffect(() => {
+                const timer = setInterval(() => {
+                    if (!isAdmin) { // 관리자 모드일 땐 슬라이드 멈춤
+                        setCurrentSlide(prev => (prev + 1) % data.heroImages.length);
+                    }
+                }, 4000);
+                return () => clearInterval(timer);
+            }, [data.heroImages.length, isAdmin]);
+
+            const updateImage = (idx, newSrc) => {
+                const newImages = [...data.heroImages];
+                newImages[idx] = newSrc;
+                updateData('heroImages', newImages);
+            };
+
+            return (
+                <section id="home" className="relative h-screen w-full overflow-hidden">
+                    {data.heroImages.map((img, idx) => (
+                        <div key={idx} 
+                             className={`absolute inset-0 transition-opacity duration-1000 ${currentSlide === idx ? 'opacity-100' : 'opacity-0'} ${isAdmin && currentSlide !== idx ? 'hidden' : ''}`}>
+                            <Editable isAdmin={isAdmin} type="image" value={img} onUpdate={(val) => updateImage(idx, val)} className="h-full w-full">
+                                <img 
+                                    src={img} 
+                                    alt="Unlink" 
+                                    className="absolute inset-0 w-full h-full object-cover"
+                                    onError={(e) => {
+                                        e.target.style.display = 'none';
+                                        const fallback = document.createElement('div');
+                                        fallback.className = 'absolute inset-0 w-full h-full flex items-center justify-center bg-gray-200 text-gray-500 font-bold text-xl';
+                                        fallback.innerText = 'Unlink';
+                                        e.target.parentElement.appendChild(fallback);
+                                    }}
+                                />
+                            </Editable>
+                            <div className="absolute inset-0 bg-black/40 pointer-events-none"></div>
+                        </div>
+                    ))}
+                    
+                    {/* 관리자용 슬라이드 컨트롤 */}
+                    {isAdmin && (
+                        <div className="absolute top-1/2 w-full flex justify-between px-4 z-20">
+                            <button onClick={() => setCurrentSlide(prev => (prev - 1 + data.heroImages.length) % data.heroImages.length)} className="bg-white/20 p-2 rounded-full hover:bg-white/40 text-white">◀</button>
+                            <button onClick={() => setCurrentSlide(prev => (prev + 1) % data.heroImages.length)} className="bg-white/20 p-2 rounded-full hover:bg-white/40 text-white">▶</button>
+                        </div>
+                    )}
+                    
+                    <div className="absolute inset-0 flex flex-col items-center justify-center text-white text-center px-4 pointer-events-none">
+                        <p className="text-lg md:text-xl mb-4 tracking-widest opacity-90">자연을 담은 건강한 밥상</p>
+                        <h2 className="text-4xl md:text-6xl font-bold serif mb-8 leading-tight">
+                            순천의 맛,<br/>{data.info.name}
+                        </h2>
+                        <div className="flex gap-4 pointer-events-auto">
+                            <a href="#menu" className="bg-primary hover:bg-dark text-white px-8 py-3 rounded-full transition-colors">메뉴 보기</a>
+                            <a href={data.info.bookingUrl} target="_blank" className="bg-white/20 backdrop-blur-md border border-white/50 hover:bg-white/30 text-white px-8 py-3 rounded-full transition-colors">예약하기</a>
+                        </div>
+                    </div>
+                </section>
+            );
+        };
+
+        const MenuSection = ({ data, updateData, isAdmin }) => {
+            const updateMenu = (idx, field, val) => {
+                const newMenus = [...data.menus];
+                newMenus[idx] = { ...newMenus[idx], [field]: val };
+                updateData('menus', newMenus);
+            };
+
+            return (
+                <section id="menu" className="py-20 bg-stone-50 scroll-mt-20">
+                    <div className="container mx-auto px-4">
+                        <div className="text-center mb-16">
+                            <span className="text-primary font-bold tracking-wider">OUR MENU</span>
+                            <h3 className="text-3xl font-bold serif mt-2 text-gray-800">정성을 담은 떡갈비 정식</h3>
+                        </div>
+
+                        <div className="grid md:grid-cols-3 gap-8">
+                            {data.menus.map((menu, idx) => (
+                                <div key={idx} className="bg-white rounded-2xl overflow-hidden shadow-lg hover:shadow-xl transition-shadow group">
+                                    <div className="h-64 overflow-hidden relative">
+                                        <Editable isAdmin={isAdmin} type="image" value={menu.image} onUpdate={(val) => updateMenu(idx, 'image', val)} className="h-full">
+                                            <img src={menu.image} alt={menu.name} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"/>
+                                        </Editable>
+                                    </div>
+                                    <div className="p-6">
+                                        <Editable isAdmin={isAdmin} type="text" value={menu.name} onUpdate={(val) => updateMenu(idx, 'name', val)}>
+                                            <h4 className="text-xl font-bold mb-2 serif text-gray-800">{menu.name}</h4>
+                                        </Editable>
+                                        
+                                        <Editable isAdmin={isAdmin} type="text" value={menu.desc} onUpdate={(val) => updateMenu(idx, 'desc', val)}>
+                                            <p className="text-gray-500 mb-4 text-sm h-10">{menu.desc}</p>
+                                        </Editable>
+
+                                        <div className="border-t border-gray-100 pt-4 space-y-2">
+                                            <div className="flex justify-between items-center">
+                                                <span className="text-gray-600">순한맛</span>
+                                                <Editable isAdmin={isAdmin} type="text" value={menu.price} onUpdate={(val) => updateMenu(idx, 'price', val)}>
+                                                    <span className="font-bold text-lg">{menu.price}원</span>
+                                                </Editable>
+                                            </div>
+                                            <div className="flex justify-between items-center text-red-800/80">
+                                                <span className="text-sm">매콤한맛</span>
+                                                <Editable isAdmin={isAdmin} type="text" value={menu.spicyPrice} onUpdate={(val) => updateMenu(idx, 'spicyPrice', val)}>
+                                                    <span className="font-bold">{menu.spicyPrice}원</span>
+                                                </Editable>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            ))}
+                        </div>
+                    </div>
+                </section>
+            );
+        };
+
+        const InfoSection = ({ data }) => {
+            return (
+                <section id="info" className="py-20 bg-white scroll-mt-20">
+                    <div className="container mx-auto px-4 grid md:grid-cols-2 gap-12 items-center">
+                        <div className="space-y-8">
+                            <div>
+                                <span className="text-primary font-bold tracking-wider">INFORMATION</span>
+                                <h3 className="text-3xl font-bold serif mt-2 mb-6 text-gray-800">오시는 길 & 영업시간</h3>
+                            </div>
+                            
+                            <div className="space-y-4">
+                                <div className="flex items-start gap-4">
+                                    <div className="bg-primary/10 p-3 rounded-full text-primary"><i data-lucide="map-pin"></i></div>
+                                    <div>
+                                        <h5 className="font-bold text-gray-800">주소</h5>
+                                        <p className="text-gray-600">{data.info.address}</p>
+                                        <a href={`https://map.naver.com/v5/search/${data.info.address}`} target="_blank" className="text-sm text-primary underline mt-1 inline-block">네이버 지도 보기</a>
+                                    </div>
+                                </div>
+                                <div className="flex items-start gap-4">
+                                    <div className="bg-primary/10 p-3 rounded-full text-primary"><i data-lucide="clock"></i></div>
+                                    <div>
+                                        <h5 className="font-bold text-gray-800">영업시간</h5>
+                                        {data.info.hours.map((line, i) => <p key={i} className="text-gray-600">{line}</p>)}
+                                    </div>
+                                </div>
+                                <div className="flex items-start gap-4">
+                                    <div className="bg-primary/10 p-3 rounded-full text-primary"><i data-lucide="phone"></i></div>
+                                    <div>
+                                        <h5 className="font-bold text-gray-800">전화번호</h5>
+                                        <p className="text-gray-600">{data.info.phone}</p>
+                                        <a href={`tel:${data.info.phone}`} className="text-sm text-primary underline mt-1 inline-block">전화 걸기</a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div className="h-[400px] bg-gray-100 rounded-2xl overflow-hidden shadow-inner">
+                            <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3269.467666205856!2d127.53163131553535!3d34.97003498036625!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3572d4b4e3f3473f%3A0x7c7f3b3b3b3b3b3b!2z7KCE652864Ko64-EIOyInOyynOyLnCDtlbTrRyDrqbQg7KCV7LGE67SJ6ri4IDMw!5e0!3m2!1sko!2skr!4v1620000000000!5m2!1sko!2skr" width="100%" height="100%" style={{border:0}} allowFullScreen="" loading="lazy"></iframe>
+                        </div>
+                    </div>
+                </section>
+            );
+        };
+
+        const ContactSection = ({ data }) => {
+            return (
+                <section id="contact" className="py-20 bg-secondary/10 scroll-mt-20">
+                    <div className="container mx-auto px-4 max-w-3xl text-center">
+                        <h3 className="text-3xl font-bold serif mb-8 text-gray-800">문의하기</h3>
+                        <div className="grid md:grid-cols-2 gap-4 mb-12">
+                            <a href={data.info.bookingUrl} target="_blank" className="flex items-center justify-center gap-2 bg-[#03C75A] text-white py-4 rounded-xl hover:opacity-90 transition-opacity"><span className="font-bold">네이버 예약하기</span></a>
+                            <a href={data.info.kakaoUrl} target="_blank" className="flex items-center justify-center gap-2 bg-[#FAE100] text-[#371D1E] py-4 rounded-xl hover:opacity-90 transition-opacity"><i data-lucide="message-circle" className="w-5 h-5"></i><span className="font-bold">카카오톡 문의</span></a>
+                        </div>
+                        <div className="bg-white p-8 rounded-2xl text-left shadow-sm">
+                            <h4 className="font-bold text-xl mb-6">자주 묻는 질문 (FAQ)</h4>
+                            <div className="space-y-4">
+                                {data.faqs.map((faq, idx) => (
+                                    <details key={idx} className="group border-b border-gray-100 pb-4 last:border-0 last:pb-0">
+                                        <summary className="flex justify-between items-center font-medium cursor-pointer list-none text-gray-800 hover:text-primary">
+                                            <span>Q. {faq.q}</span>
+                                            <span className="transition group-open:rotate-180"><i data-lucide="chevron-down" className="w-4 h-4"></i></span>
+                                        </summary>
+                                        <p className="text-gray-600 mt-3 pl-4 text-sm leading-relaxed bg-gray-50 p-3 rounded-lg">A. {faq.a}</p>
+                                    </details>
+                                ))}
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            );
+        };
+
+        const Footer = ({ data }) => {
+            return (
+                <footer className="bg-dark text-white py-12">
+                    <div className="container mx-auto px-4 text-center">
+                        <h2 className="text-2xl font-bold serif mb-6">{data.info.name}</h2>
+                        <div className="flex justify-center gap-6 mb-8">
+                            <a href="#" className="hover:text-secondary"><i data-lucide="instagram"></i></a>
+                            <a href="#" className="hover:text-secondary"><i data-lucide="phone"></i></a>
+                        </div>
+                        <p className="text-white/60 text-sm">
+                            {data.info.address} <br/>
+                            Tel: {data.info.phone} | Owner: {data.info.name} <br/>
+                            Copyright © 2024 Sandle Dameun. All rights reserved.
+                        </p>
+                    </div>
+                </footer>
+            );
+        };
+
+        const App = () => {
+            const [data, setData] = useState(INITIAL_DATA);
+            const [isAdmin, setIsAdmin] = useState(false);
+
+            useEffect(() => {
+                lucide.createIcons();
+            }, []);
+
+            useEffect(() => {
+                // 데이터 변경 시 아이콘 다시 로드 (DOM 변경 대응)
+                setTimeout(() => lucide.createIcons(), 100);
+            }, [data, isAdmin]);
+
+            const updateData = (key, value) => {
+                setData(prev => ({ ...prev, [key]: value }));
+            };
+
+            const handleSave = () => {
+                if (!confirm("변경된 내용으로 새로운 HTML 파일을 다운로드하시겠습니까? \n(다운로드된 파일을 기존 파일과 교체해야 적용됩니다)")) return;
+
+                // 현재 HTML 내용을 가져와서 DATA 부분만 교체
+                const currentHtml = document.documentElement.outerHTML;
+                const newDataString = JSON.stringify(data, null, 4);
+                
+                // 정규식으로 기존 DATA 객체 찾아서 교체 (주의: 매우 단순한 방식이므로 코드 구조 유지 필수)
+                // 줄바꿈이나 공백 차이로 실패할 수 있으므로, 식별 가능한 마커를 사용하는 것이 좋지만
+                // 여기서는 MVP 구현을 위해 DATA 변수 선언부를 통째로 교체 시도
+                
+                // 더 안전한 방법: 스크립트 태그 내의 INITIAL_DATA 변수를 찾아서 교체
+                const scriptStart = 'const INITIAL_DATA = ';
+                const scriptEnd = ';// --- COMPONENTS ---'; // 식별자
+                
+                // 단순 치환을 위해 현재 파일의 구조를 정확히 알아야 함.
+                // 여기서는 브라우저 메모리상의 데이터로 HTML을 재구성하는 방식이 복잡하므로,
+                // "현재 상태를 포함한 복제본"을 만드는 방식을 사용.
+                
+                // 1. 현재 HTML 문자열 가져오기 (이건 초기 상태임)
+                // 2. 스크립트 내의 INITIAL_DATA 값을 현재 data 상태로 치환
+                
+                fetch(window.location.href)
+                    .then(res => res.text())
+                    .then(originalHtml => {
+                        // 원본 HTML에서 INITIAL_DATA 부분 찾기
+                        const regex = /const INITIAL_DATA = \{[\s\S]*?\};/;
+                        const newContent = `const INITIAL_DATA = ${newDataString};`;
+                        
+                        const newHtml = originalHtml.replace(regex, newContent);
+                        
+                        // 파일 다운로드 트리거
+                        const blob = new Blob([newHtml], { type: 'text/html' });
+                        const url = URL.createObjectURL(blob);
+                        const a = document.createElement('a');
+                        a.href = url;
+                        a.download = 'index_updated.html';
+                        a.click();
+                        URL.revokeObjectURL(url);
+                    })
+                    .catch(err => {
+                        alert("파일 저장 중 오류가 발생했습니다. (로컬 파일 실행 시 보안 정책으로 인해 원본 읽기가 제한될 수 있습니다.)");
+                        console.error(err);
+                        
+                        // Fallback: 현재 DOM 기반으로 재구성 시도 (완벽하지 않을 수 있음)
+                        alert("대안: 콘솔에 출력된 데이터를 복사해서 index.html에 붙여넣으세요.");
+                        console.log(newDataString);
+                    });
+            };
+
+            return (
+                <div className="min-h-screen">
+                    {/* 관리자 모드 토글 버튼 */}
+                    <div className="fixed bottom-4 right-4 z-50 flex flex-col gap-2">
+                         {isAdmin && (
+                            <button onClick={handleSave} className="bg-blue-600 text-white px-4 py-3 rounded-full shadow-lg font-bold hover:bg-blue-700 transition-colors flex items-center gap-2">
+                                <i data-lucide="save"></i> 저장하기
+                            </button>
+                        )}
+                        <button onClick={() => setIsAdmin(!isAdmin)} className={`px-4 py-3 rounded-full shadow-lg font-bold transition-colors flex items-center gap-2 ${isAdmin ? 'bg-red-500 text-white' : 'bg-gray-800 text-white'}`}>
+                            <i data-lucide={isAdmin ? "x" : "settings"}></i>
+                            {isAdmin ? '편집 종료' : '관리자 모드'}
+                        </button>
+                    </div>
+
+                    <Header data={data} isAdmin={isAdmin} />
+                    <Hero data={data} updateData={updateData} isAdmin={isAdmin} />
+                    <MenuSection data={data} updateData={updateData} isAdmin={isAdmin} />
+                    <InfoSection data={data} />
+                    <ContactSection data={data} />
+                    <Footer data={data} />
+                </div>
+            );
+        };
+
+        const root = ReactDOM.createRoot(document.getElementById('root'));
+        root.render(<App />);
+    </script>
+</body>
+</html>
