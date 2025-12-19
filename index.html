@@ -486,18 +486,7 @@
 
             return (
                 <div className="min-h-screen">
-                    {/* 관리자 모드 토글 버튼 */}
-                    <div className="fixed bottom-4 right-4 z-50 flex flex-col gap-2">
-                         {isAdmin && (
-                            <button onClick={handleSave} className="bg-blue-600 text-white px-4 py-3 rounded-full shadow-lg font-bold hover:bg-blue-700 transition-colors flex items-center gap-2">
-                                <i data-lucide="save"></i> 저장하기
-                            </button>
-                        )}
-                        <button onClick={() => setIsAdmin(!isAdmin)} className={`px-4 py-3 rounded-full shadow-lg font-bold transition-colors flex items-center gap-2 ${isAdmin ? 'bg-red-500 text-white' : 'bg-gray-800 text-white'}`}>
-                            <i data-lucide={isAdmin ? "x" : "settings"}></i>
-                            {isAdmin ? '편집 종료' : '관리자 모드'}
-                        </button>
-                    </div>
+                    {/* 관리자 모드 토글 버튼 제거됨 */}
 
                     <Header data={data} isAdmin={isAdmin} />
                     <Hero data={data} updateData={updateData} isAdmin={isAdmin} />
